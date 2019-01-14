@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <io.h>
+//#include <io.h>
 
 using namespace std;
 
@@ -27,7 +27,6 @@ private:
 	vector<double> threshold; //阈值表
 	vector<bool> susceptible; //节点是否可被感染（在易染表中）
 	vector<int> suslist; //可被感染节点表
-	vector<string> files;
 	vector<vector<int> > kk;
 	vector<int> nk; //节点的度
 	default_random_engine e;
@@ -85,39 +84,19 @@ public:
 		}
 	}
 
-	void getAllFile(const char* path) {
-		_finddata_t file;
-		intptr_t lf;
-		//输入文件夹路径
-		if ((lf = _findfirst(path, &file)) == -1)  //若将*.*改为*.txt，则会输出该文件夹下所有的txt文件名
-			cout << "Not Found!" << endl;
-		else {
-			//输出文件名
-			files.push_back(file.name);
-			while (_findnext(lf, &file) == 0) {
-				files.push_back(file.name);
-			}
-		}
-		_findclose(lf);
-	}
 
-	void countdegree(const char* path, string outpath) {
+	void countdegree(string path, int filenum, string outpath) {
 		getnk();
-		vector<int> degree = { 10,20,30,40,50,60,70,80 };
+		int d[] = { 10,20,30,40,50,60,70,80 };
+		vector<int> degree(d, d + 8);
 		kk.clear();
 		kk.resize(degree.size());
-		char path2[30];
-		strcpy(path2, path);
-		strcat(path2, "*.*");
-		kk.clear();
-		getAllFile(path2);
-		string fpath = path;
 		string filename;
 		string line;
 		int sum;
 		int m;
-		for (int i = 0; i < files.size(); i++) {//读取所有文件
-			filename = fpath + files[i];
+		for (int i = 0; i <= filenum; i++) {//读取所有文件
+			filename = path + "_" + to_string(i) + ".txt";
 			ifstream in(filename);
 			while (getline(in, line)) 
 			{
@@ -563,7 +542,7 @@ int main()
 		string datafile = "weiboid"+ to_string(i)+".txt";
 		n.real_spreading(i, "./real_spread/" + datafile, "./SI/SI_infected_neighbor");
 	}*/
-	n.countdegree("./real_spread/", "./real_spread/");
+	n.countdegree("./real_spread/", 100, "./real_spread/");
 //	n.SI(200, 50, 0.1, 20, "./SI/SI_ratio.txt", "./SI/SI_infected_neighbor"); //(重复次数，种子数量，输出时间间隔，总时间，感染率文件，感染邻居数量文件)
 //	n.TH(200, 1, 0.001, 0.1, 20, "./TH/TH_ratio.txt", "./TH/TH_infected_neighbor"); //(重复次数，种子数量，阈值，输出时间间隔，总时间，感染率文件，感染邻居数量文件)
 	system("pause");
